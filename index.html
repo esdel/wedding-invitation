@@ -11,31 +11,26 @@
       <!--JavaScript at end of body for optimized loading-->
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
       <script type="text/javascript" src="js/materialize.min.js"></script>
-      <!--map-->
-      <meta charset="UTF-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-      <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?clientId=OUvEZke0ukDlnpDSCmNM"></script>
       <!--google map-->
       <meta name="viewport" content="initial-scale=1.0">
       <meta charset="utf-8">
       <style>
       #map_canvas {
           width : 100%; /* 구글 지도 넓이 */
-          height: 300px; /* 구글 지도 높이 */
-          font-size:12px;
+          height: 500px; /* 구글 지도 높이 */
+          font-size:10px;
       }
 
       /* 말풍선관련 css 시작 */
       #map_canvas .map_Heading { /* 말풍선 타이틀(회사명) css */
           line-height:30px;
-          font-size:20px;
+          font-size:15px;
           font-weight:bold;
           color:#30C;
       }
 
       #map_canvas .map_Content { /* 말풍선 내용 css */
-          font-size:12px;
+          font-size:10px;
           color:#333;
       }
 
@@ -128,81 +123,72 @@
       </div>
       <div class="row">
         <div class="col s12 center">
-          <div id="map" style="width:100%;height:400px;"></div>
+
+          <div id="map_canvas" style="border:1px solid #ccc; margin:0 0 0px 0;"></div>
+          <script>
+          /*
+          API키는 https://developers.google.com/maps/documentation/javascript/get-api-key 에서 발급합니다.
+          http://maps.googleapis.com/maps/api/geocode/xml?sensor=true&address=서울시 구로구 디지털로 242
+          위의 링크에서 뒤에 주소를 적어서 웹브라우저로 실행하면 x,y 값을 구할수 있습니다.
+          <location>
+          <lat>37.4808224</lat>   이것이 Y_point
+          <lng>126.8926653</lng>  이것이 X-point
+          </location>
+
+          Sample  https://developers.google.com/maps/documentation/javascript/tutorial?hl=ko
+          */
+          var map;
+          var Y_point        = 37.488072;    // lat 값
+          var X_point        = 127.134768;   // lng 값
+          var zoomLevel      = 15;  // 첫 로딩시 보일 지도의 확대 레벨
+
+          var markerTitle    = "문정동성당";  // 현재 위치 마커에 마우스를 올렸을때 나타나는 이름
+          var markerMaxWidth = 200;  // 마커를 클릭했을때 나타나는 말풍선의 최대 크기
+
+          // 말풍선 내용
+          var contentString    = '<div>' +
+          '<span class="map_Heading">'+markerTitle+'</span>'+
+          '<div class="map_Content">'+
+              '<a href="tel:02-431-5233" class="map_Content">☎ 02-431-5233</a> &nbsp;/&nbsp; Fax.02-865-3528<br />메일주소: <a href="mailto:mail@happyjung.com" class="map_Content">mail@happyjung.com</a><br />'+
+              '서울특별시 송파구 장지동 송이로37가길 14<br />' +
+              '<a href="http://www.happyjung.com" target="_blank" class="map_Content">http://www.happyjung.com</a>'+
+          '</div>'+
+          <!-- // -->
+          '</div>';
+
+          function initMap() {
+
+              var myLatlng = new google.maps.LatLng(Y_point, X_point);
+              var mapOptions = {
+                  zoom: zoomLevel,
+                  center: myLatlng,
+                  mapTypeId: google.maps.MapTypeId.ROADMAP
+              }
+              var map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+
+              var marker = new google.maps.Marker({
+                  position: myLatlng,
+                  map: map,
+                  draggable:true,
+                  animation: google.maps.Animation.DROP,
+                  title: markerTitle
+              });
+
+              var infowindow = new google.maps.InfoWindow({
+                  content: contentString,
+                  maxWidth: markerMaxWidth
+              });
+              infowindow.open(map, marker);
+
+              google.maps.event.addListener(marker, 'click', function() {
+                  infowindow.open(map, marker);
+              });
+          }
+          </script>
+
+          <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxp7tqTYdwaQtA6CAUa7gfbNz6Sc3Lzrk&callback=initMap" async defer></script>
         </div>
       </div>
-      <script>
-      var mapOptions = {
-          center: new naver.maps.LatLng(37.3595704, 127.105399),
-          zoom: 10
-      };
-
-      var map = new naver.maps.Map('map', mapOptions);
-      </script>
-
-      <div id="map_canvas" style="border:1px solid #ccc; margin:0 0 0px 0;"></div>
-      <script>
-      /*
-      API키는 https://developers.google.com/maps/documentation/javascript/get-api-key 에서 발급합니다.
-      http://maps.googleapis.com/maps/api/geocode/xml?sensor=true&address=서울시 구로구 디지털로 242
-      위의 링크에서 뒤에 주소를 적어서 웹브라우저로 실행하면 x,y 값을 구할수 있습니다.
-      <location>
-      <lat>37.4808224</lat>   이것이 Y_point
-      <lng>126.8926653</lng>  이것이 X-point
-      </location>
-
-      Sample  https://developers.google.com/maps/documentation/javascript/tutorial?hl=ko
-      */
-      var map;
-      var Y_point        = 37.4808224;    // lat 값
-      var X_point        = 126.8926653;   // lng 값
-      var zoomLevel      = 15;  // 첫 로딩시 보일 지도의 확대 레벨
-
-      var markerTitle    = "해피정닷컴";  // 현재 위치 마커에 마우스를 올렸을때 나타나는 이름
-      var markerMaxWidth = 300;  // 마커를 클릭했을때 나타나는 말풍선의 최대 크기
-
-      // 말풍선 내용
-      var contentString    = '<div>' +
-      '<span class="map_Heading">'+markerTitle+'</span>'+
-      '<div class="map_Content">'+
-          '<a href="tel:070-7600-3500" class="map_Content">☎ 070-7600-3500</a> &nbsp;/&nbsp; Fax.02-865-3528<br />메일주소: <a href="mailto:mail@happyjung.com" class="map_Content">mail@happyjung.com</a><br />'+
-          '서울시 구로구 디지털로 242 한화비즈메트로1차 15층<br />' +
-          '<a href="http://www.happyjung.com" target="_blank" class="map_Content">http://www.happyjung.com</a>'+
-      '</div>'+
-      <!-- // -->
-      '</div>';
-
-      function initMap() {
-
-          var myLatlng = new google.maps.LatLng(Y_point, X_point);
-          var mapOptions = {
-              zoom: zoomLevel,
-              center: myLatlng,
-              mapTypeId: google.maps.MapTypeId.ROADMAP
-          }
-          var map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-
-          var marker = new google.maps.Marker({
-              position: myLatlng,
-              map: map,
-              draggable:true,
-              animation: google.maps.Animation.DROP,
-              title: markerTitle
-          });
-
-          var infowindow = new google.maps.InfoWindow({
-              content: contentString,
-              maxWidth: markerMaxWidth
-          });
-          infowindow.open(map, marker);
-
-          google.maps.event.addListener(marker, 'click', function() {
-              infowindow.open(map, marker);
-          });
-      }
-      </script>
-
-      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxp7tqTYdwaQtA6CAUa7gfbNz6Sc3Lzrk&callback=initMap" async defer></script>
       <div class="row">
         <p>서울특별시 송파구 송이로37가길 14<br><b>천주교문정동교회</b></p>
       </div>
